@@ -1,0 +1,1 @@
+"""XBee Watercounter Custom Component."""
