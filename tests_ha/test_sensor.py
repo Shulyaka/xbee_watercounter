@@ -2,6 +2,8 @@
 
 import datetime as dt
 
+from homeassistant.const import ATTR_ENTITY_ID
+
 from .conftest import commands
 from .const import IEEE
 
@@ -13,13 +15,23 @@ def test_test(hass):
 
 
 async def test_counter(hass, data_from_device, test_config_entry):
-    """Test counter."""
+    """Test counter sensor."""
 
     assert hass.states.get("sensor.xbee_watercounter_1_counter").state == "unknown"
     data_from_device(hass, IEEE, {"counter_0": 12345})
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.xbee_watercounter_1_counter").state == "12.345"
+
+    await hass.services.async_call(
+        "xbee_watercounter",
+        "set_value",
+        {ATTR_ENTITY_ID: "sensor.xbee_watercounter_1_counter", "value": 12.346},
+        blocking=True,
+    )
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.xbee_watercounter_1_counter").state == "12.346"
 
 
 async def test_uptime_set(hass, data_from_device, test_config_entry):

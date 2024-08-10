@@ -1,0 +1,14 @@
+set_value:
+  target:
+    entity:
+      domain: sensor
+      integration: xbee_watercounter
+  fields:
+    value:
+      selector:
+        number:
+          min: 0
+          max: 99999.999
+          step: 1e-3
+          mode: box
+          unit_of_measurement: m³

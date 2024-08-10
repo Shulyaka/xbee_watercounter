@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import datetime as dt
 
+import voluptuous as vol
 from homeassistant.components.sensor import (
     RestoreSensor,
     SensorDeviceClass,
@@ -12,12 +13,17 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import EntityCategory, UnitOfVolume
 from homeassistant.core import callback
+from homeassistant.helpers import entity_platform
 
 from .const import DOMAIN
 from .coordinator import XBeeWatercounterDataUpdateCoordinator
 from .entity import XBeeWatercounterEntity
 
+SERVICE_SET_VALUE = "set_value"
+
+ATTR_VALUE = "value"
 ATTR_RESET_CAUSE = "reset_cause"
+
 BROWNOUT_RESET = "brownout"
 LOCKUP_RESET = "lockup"
 PWRON_RESET = "power on"
@@ -46,7 +52,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
             state_class=SensorStateClass.TOTAL,
         )
         sensors.append(
-            XBeeWatercounterSensor(
+            XBeeWatercounterCounterSensor(
                 name="counter",
                 number=number,
                 coordinator=coordinator,
@@ -74,10 +80,17 @@ async def async_setup_entry(hass, entry, async_add_entities):
         )
     )
 
+    platform = entity_platform.async_get_current_platform()
+    platform.async_register_entity_service(
+        SERVICE_SET_VALUE,
+        {vol.Required(ATTR_VALUE): vol.Coerce(float)},
+        f"async_{SERVICE_SET_VALUE}",
+    )
+
     async_add_entities(sensors)
 
 
-class XBeeWatercounterSensor(XBeeWatercounterEntity, RestoreSensor):
+class XBeeWatercounterBaseSensor(XBeeWatercounterEntity, RestoreSensor):
     """Representation of an XBee Watercounter sensors."""
 
     def __init__(
@@ -102,15 +115,6 @@ class XBeeWatercounterSensor(XBeeWatercounterEntity, RestoreSensor):
         """Run when entity about to be added."""
         await super().async_added_to_hass()
 
-        if self._name == "uptime" or self.coordinator.data.get("uptime", 0) > 0:
-            self._handle_coordinator_update()
-        else:
-            if (old_data := await self.async_get_last_sensor_data()) is not None:
-                if old_data.native_value is not None:
-                    self._attr_native_value = old_data.native_value
-
-            await self._update_device()
-
         async def async_update_state(value):
             if self._conversion is not None:
                 value = self._conversion(value)
@@ -123,6 +127,23 @@ class XBeeWatercounterSensor(XBeeWatercounterEntity, RestoreSensor):
         self.async_on_remove(
             self.coordinator.client.add_subscriber(subscriber_name, async_update_state)
         )
+
+
+class XBeeWatercounterCounterSensor(XBeeWatercounterBaseSensor, RestoreSensor):
+    """Representation of an XBee Watercounter Counter sensors."""
+
+    async def async_added_to_hass(self):
+        """Run when entity about to be added."""
+        await super().async_added_to_hass()
+
+        if self.coordinator.data.get("uptime", 0) > 0:
+            self._handle_coordinator_update()
+        else:
+            if (old_data := await self.async_get_last_sensor_data()) is not None:
+                if old_data.native_value is not None:
+                    self._attr_native_value = old_data.native_value
+
+            await self._update_device()
 
         self.async_on_remove(
             self.coordinator.add_subscriber("device_reset", self._update_device)
@@ -156,8 +177,14 @@ class XBeeWatercounterSensor(XBeeWatercounterEntity, RestoreSensor):
                 self._name, self._number, self._attr_native_value
             )
 
+    async def async_set_value(self, value: float) -> None:
+        """Manually set value."""
+        self._attr_native_value = int(value * 1000)
+        await self._update_device()
+        self.schedule_update_ha_state()
 
-class XBeeWatercounterUptimeSensor(XBeeWatercounterSensor):
+
+class XBeeWatercounterUptimeSensor(XBeeWatercounterBaseSensor):
     """Representation of an XBee Watercounter Uptime sensor."""
 
     def __init__(
@@ -170,6 +197,12 @@ class XBeeWatercounterUptimeSensor(XBeeWatercounterSensor):
         """Initialize the switch class."""
         super().__init__(name, None, coordinator, entity_description, conversion)
         self._attr_reset_cause = UNKNOWN
+
+    async def async_added_to_hass(self):
+        """Run when entity about to be added."""
+        await super().async_added_to_hass()
+
+        self._handle_coordinator_update()
 
     @property
     def extra_state_attributes(self):
@@ -200,6 +233,3 @@ class XBeeWatercounterUptimeSensor(XBeeWatercounterSensor):
                 self._attr_reset_cause = UNKNOWN_RESET.format(reset_cause)
 
         self.schedule_update_ha_state()
-
-    async def _update_device(self):
-        """Update device settings from HA on reset."""

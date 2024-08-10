@@ -35,5 +35,17 @@
           }
       }
     }
+  },
+  "services": {
+    "set_value": {
+      "name": "Set counter value",
+      "description": "Manually overrides current value of the counter.",
+      "fields": {
+        "value": {
+          "name": "Value",
+          "description": "New value to set."
+        }
+      }
+    }
   }
 }
