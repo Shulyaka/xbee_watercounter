@@ -23,10 +23,13 @@ main_loop.schedule_task(lambda: _LOGGER.debug("Main loop started"))
 if config.debug:
     print("Debug mode enabled")
 
-    for x, counter in enumerate(config.counter):
+    x = 0
+    for counter in config.counter:
         counter.subscribe((lambda n: lambda v: print("counter{} = {}".format(n, v)))(x))
+        x += 1
 
-    for x, valve in enumerate(config.valve):
+    x = 0
+    for valve in config.valve:
         valve.subscribe((lambda n: lambda v: print("valve{} = {}".format(n, v)))(x))
         valve.is_opening.subscribe(
             (lambda n: lambda v: print("valve{}.is_opening = {}".format(n, v)))(x)
@@ -34,6 +37,7 @@ if config.debug:
         valve.is_closing.subscribe(
             (lambda n: lambda v: print("valve{}.is_closing = {}".format(n, v)))(x)
         )
+        x += 1
 
     def _stats():
         """Print mem stats."""
