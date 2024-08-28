@@ -12,17 +12,18 @@ collect()
 debug = False
 
 Pin("D0", mode=Pin.ALT, alt=Pin.AF0_COMMISSION)
-Pin("D5", mode=Pin.ALT, alt=Pin.AF5_ASSOC_IND)
+aux_led = DigitalOutput("D4")
+aux_button = DigitalInput("D5")
 Pin("D10", mode=Pin.ALT, alt=Pin.AF10_RSSI)
 counter = [
-    Counter(sensor=DigitalInput("D4")),
-    Counter(sensor=DigitalInput("D6")),
-    Counter(sensor=DigitalInput("D7")),
+    Counter(sensor=DigitalInput("D2")),
+    Counter(sensor=DigitalInput("D3")),
+    Counter(sensor=DigitalInput("D9")),
 ]
 valve = [
-    Valve(direction_switch=DigitalOutput("D1"), power_switch=DigitalOutput("D2")),
-    Valve(direction_switch=DigitalOutput("D3"), power_switch=DigitalOutput("D8")),
-    Valve(direction_switch=DigitalOutput("D9"), power_switch=DigitalOutput("D11")),
+    Valve(direction_switch=DigitalOutput("D12"), power_switch=DigitalOutput("D15")),
+    Valve(direction_switch=DigitalOutput("D16"), power_switch=DigitalOutput("D17")),
+    Valve(direction_switch=DigitalOutput("D18"), power_switch=DigitalOutput("D19")),
 ]
 
 collect()
