@@ -5,7 +5,6 @@ from gc import collect
 import machine
 import uos
 from micropython import opt_level
-from xbee import atcmd
 
 _bundle_list = [
     "lib/logging.mpy",
@@ -18,8 +17,6 @@ _bundle_list = [
     "config.mpy",
     "__init__.mpy",
 ]
-
-atcmd("AP", 0)
 
 # First stage: compile files
 if any(file.endswith(".py") for file in uos.listdir() + uos.listdir("lib")):

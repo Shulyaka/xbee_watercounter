@@ -13,7 +13,6 @@ from uos import (
     remove as mock_remove,
     sync as mock_sync,
 )
-from xbee import atcmd as mock_atcmd
 
 
 def test_bundle_compile():
@@ -25,7 +24,6 @@ def test_bundle_compile():
     mock_listdir.return_value = ["test.py"]
     mock_compile.reset_mock()
     mock_opt_level.reset_mock()
-    mock_atcmd.reset_mock()
     mock_remove.reset_mock()
     mock_sync.reset_mock()
     mock_bundle.reset_mock()
@@ -39,7 +37,6 @@ def test_bundle_compile():
     importlib.reload(bundle)
 
     mock_opt_level.assert_called_once_with(3)
-    mock_atcmd.assert_called_once_with("AP", 0)
     assert mock_compile.call_args_list == [call("test.py"), call("test.py")]
     assert mock_remove.call_args_list == [
         call("test.mpy"),
@@ -73,7 +70,6 @@ def test_bundle_compile_main_bundle():
     mock_listdir.return_value = ["aaa.py", "bundle.py", "main.py", "zzz.py"]
     mock_compile.reset_mock()
     mock_opt_level.reset_mock()
-    mock_atcmd.reset_mock()
     mock_remove.reset_mock()
     mock_sync.reset_mock()
     mock_bundle.reset_mock()
@@ -81,7 +77,6 @@ def test_bundle_compile_main_bundle():
     importlib.reload(bundle)
 
     mock_opt_level.assert_called_once_with(3)
-    mock_atcmd.assert_called_once_with("AP", 0)
     assert mock_compile.call_args_list[:2] == [call("main.py"), call("bundle.py")]
     assert mock_sync.call_count == 2
     assert mock_bundle.call_count == 3
@@ -90,7 +85,6 @@ def test_bundle_compile_main_bundle():
 def test_bundle_all_compiled():
     """Test bundle after compile."""
     mock_listdir.return_value = ["bundle.mpy", "test.mpy"]
-    mock_atcmd.reset_mock()
     mock_remove.reset_mock()
     mock_sync.reset_mock()
     mock_soft_reset.reset_mock()
@@ -99,7 +93,6 @@ def test_bundle_all_compiled():
 
     importlib.reload(bundle)
 
-    mock_atcmd.assert_called_once_with("AP", 0)
     mock_remove.assert_called_once_with("bundle.mpy")
     mock_sync.assert_called_once_with()
     mock_soft_reset.assert_called_once_with()
