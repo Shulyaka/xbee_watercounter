@@ -6,6 +6,7 @@ import asyncio
 import datetime as dt
 import json
 import logging
+from typing import Any
 
 from homeassistant.components.zha import DOMAIN as ZHA_DOMAIN
 from homeassistant.components.zha.websocket_api import (
@@ -330,7 +331,7 @@ class XBeeWatercounterDataUpdateCoordinator(DataUpdateCoordinator):
     async def async_update_data(self):
         """Update data."""
         await self.client.async_command("bind")
-        data = {"counter": {}, "valve": {}}
+        data: dict[str, Any] = {"counter": {}, "valve": {}}
         if self._device_reset and self._uptime is not None:
             data["uptime"] = self._uptime
         else:
