@@ -22,7 +22,7 @@ counter = [
 ]
 valve = [
     Valve(direction_switch=DigitalOutput("D12"), power_switch=DigitalOutput("D15")),
-    Valve(direction_switch=DigitalOutput("D16"), power_switch=DigitalOutput("D17")),
+    Valve(direction_switch=DigitalOutput("D8"), power_switch=DigitalOutput("D17")),
     Valve(direction_switch=DigitalOutput("D18"), power_switch=DigitalOutput("D19")),
 ]
 
