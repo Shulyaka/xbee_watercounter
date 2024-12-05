@@ -91,6 +91,8 @@ commands = {
     "reset_cause": MagicMock(),
 }
 
+nonce = 1
+
 
 # This fixture enables two-way communication with the device. The calls are logged
 # in the calls array. The command responses can be configured with command dict.
@@ -145,7 +147,9 @@ def data_from_device_fixture(hass):
             response = commands[cmd](data["args"])
         else:
             response = commands[cmd]()
-        data_from_device(hass, call.data["ieee"], {cmd + "_resp": response})
+        data_from_device(
+            hass, call.data["ieee"], {cmd + "_resp": response, "nonce": nonce}
+        )
 
     hass.services.async_register("zha", "issue_zigbee_cluster_command", log_call)
 
