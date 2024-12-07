@@ -44,7 +44,6 @@ async def async_setup_entry(hass, entry, async_add_entities):
             key="xbee_watercounter_counter_" + str(number + 1),
             name="Counter",
             has_entity_name=True,
-            icon="mdi:speedometer",
             device_class=SensorDeviceClass.WATER,
             native_unit_of_measurement=UnitOfVolume.LITERS,
             suggested_unit_of_measurement=UnitOfVolume.CUBIC_METERS,
