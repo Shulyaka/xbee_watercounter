@@ -1,11 +1,12 @@
 """Global fixtures for xbee_watercounter integration."""
 
 import json
+import logging
 from functools import partial
 from unittest.mock import DEFAULT, MagicMock, patch
 
 import pytest
-from homeassistant.core import callback
+from homeassistant.core import HomeAssistant, callback
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.xbee_watercounter.const import DOMAIN
@@ -16,8 +17,11 @@ from .const import MOCK_CONFIG
 # This fixture enables loading custom integrations in all tests.
 # Remove to enable selective use of this fixture
 @pytest.fixture(autouse=True)
-def auto_enable_custom_integrations(enable_custom_integrations):
-    """Enable custom integrations."""
+def auto_enable_custom_integrations(recorder_mock, enable_custom_integrations):
+    """Enable custom integrations and suppress unwanted logging."""
+    for name in ["sqlalchemy.engine.Engine", "homeassistant.components.recorder"]:
+        logger = logging.getLogger(name)
+        logger.setLevel(logging.ERROR)
     yield
 
 
@@ -162,7 +166,7 @@ def data_from_device_fixture(hass):
 
 # This fixture loads and unloads the test config entry
 @pytest.fixture
-async def test_config_entry(hass):
+async def test_config_entry(hass: HomeAssistant):
     """Load and unload hass config entry."""
 
     config_entry = MockConfigEntry(domain=DOMAIN, data=MOCK_CONFIG, entry_id="test")

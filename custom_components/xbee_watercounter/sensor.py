@@ -3,17 +3,26 @@
 from __future__ import annotations
 
 import datetime as dt
+from functools import partial
 
 import voluptuous as vol
+from homeassistant.components.recorder import get_instance, history
 from homeassistant.components.sensor import (
+    UNIT_CONVERTERS,
     RestoreSensor,
     SensorDeviceClass,
     SensorEntityDescription,
     SensorStateClass,
 )
-from homeassistant.const import EntityCategory, UnitOfVolume
+from homeassistant.const import (
+    STATE_UNAVAILABLE,
+    STATE_UNKNOWN,
+    EntityCategory,
+    UnitOfVolume,
+)
 from homeassistant.core import callback
 from homeassistant.helpers import entity_platform
+from homeassistant.util.enum import try_parse_enum
 
 from .const import DOMAIN
 from .coordinator import XBeeWatercounterDataUpdateCoordinator
@@ -138,15 +147,59 @@ class XBeeWatercounterCounterSensor(XBeeWatercounterBaseSensor, RestoreSensor):
         if self.coordinator.data.get("uptime", 0) > 0:
             self._handle_coordinator_update()
         else:
-            if (old_data := await self.async_get_last_sensor_data()) is not None:
-                if old_data.native_value is not None:
-                    self._attr_native_value = old_data.native_value
+            value = self.coordinator.data.get(self._name)
+            if value is not None and self._number is not None:
+                value = value.get(self._number)
+            if self._conversion is not None:
+                value = self._conversion(value)
+            if value is None:
+                value = 0
+
+            if (
+                old_data := await self.async_get_last_sensor_data()
+            ) is not None and old_data.native_value is not None:
+                self._attr_native_value = old_data.native_value + value
+                self.schedule_update_ha_state()
+            else:
+                sensor_history = await get_instance(self.hass).async_add_executor_job(
+                    partial(
+                        history.get_last_state_changes,
+                        self.hass,
+                        10,
+                        entity_id=self.entity_id,
+                    )
+                )
+                for old_state in sensor_history.get(self.entity_id, []):
+                    if old_state.state not in (STATE_UNKNOWN, STATE_UNAVAILABLE):
+                        self._attr_native_value = (
+                            self._reverse_native_unit_conversion(float(old_state.state))
+                            + value
+                        )
+                        self.schedule_update_ha_state()
+                        break
 
             await self._update_device()
 
         self.async_on_remove(
             self.coordinator.add_subscriber("device_reset", self._update_device)
         )
+
+    def _reverse_native_unit_conversion(self, value: float) -> float:
+        """Get native value from entity state."""
+        native_unit_of_measurement = self.native_unit_of_measurement
+        unit_of_measurement = self.unit_of_measurement
+        device_class = try_parse_enum(SensorDeviceClass, self.device_class)
+
+        if native_unit_of_measurement != unit_of_measurement and (
+            converter := UNIT_CONVERTERS.get(device_class)
+        ):
+            # Unit conversion needed
+            value = converter.converter_factory(
+                unit_of_measurement,
+                native_unit_of_measurement,
+            )(value)
+
+        return value
 
     @callback
     def _handle_coordinator_update(self) -> None:
