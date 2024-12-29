@@ -19,7 +19,7 @@ def test_test(hass):
 
 
 async def test_init_unknown(hass, caplog, data_from_device, test_config_entry):
-    """Test component initialization with no device data."""
+    """Test component initialization with no history and device data."""
 
     assert len(commands) == 10
     commands["bind"].assert_called_once_with()
