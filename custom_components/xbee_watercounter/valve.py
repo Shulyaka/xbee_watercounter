@@ -2,13 +2,23 @@
 
 from __future__ import annotations
 
+from functools import partial
+
+from homeassistant.components.recorder import get_instance, history
 from homeassistant.components.valve import (
+    ATTR_CURRENT_POSITION,
+    STATE_CLOSED,
+    STATE_CLOSING,
+    STATE_OPEN,
+    STATE_OPENING,
     ValveDeviceClass,
     ValveEntity,
     ValveEntityDescription,
     ValveEntityFeature,
 )
+from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import callback
+from homeassistant.helpers.restore_state import RestoreEntity
 
 from .const import DOMAIN
 from .coordinator import XBeeWatercounterDataUpdateCoordinator
@@ -39,7 +49,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
     async_add_entities(valves)
 
 
-class XBeeWatercounterValve(XBeeWatercounterEntity, ValveEntity):
+class XBeeWatercounterValve(XBeeWatercounterEntity, ValveEntity, RestoreEntity):
     """Representation of an XBee Watercounter valves."""
 
     _attr_supported_features = (
@@ -66,7 +76,63 @@ class XBeeWatercounterValve(XBeeWatercounterEntity, ValveEntity):
         """Run when entity about to be added."""
         await super().async_added_to_hass()
 
-        self._handle_coordinator_update()
+        if self.coordinator.data.get("uptime", 0) > 0:
+            self._handle_coordinator_update()
+        else:
+            if (
+                old_state := await self.async_get_last_state()
+            ) is not None and old_state.state not in (STATE_UNKNOWN, STATE_UNAVAILABLE):
+                if old_state.attributes.get(ATTR_CURRENT_POSITION) is not None:
+                    self._attr_current_valve_position = float(
+                        old_state.attributes[ATTR_CURRENT_POSITION]
+                    )
+                elif old_state.state == STATE_OPEN:
+                    self._attr_current_valve_position = 100
+                elif old_state.state == STATE_CLOSED:
+                    self._attr_current_valve_position = 0
+
+                if old_state.state == STATE_OPENING:
+                    self._attr_current_valve_position = 100
+                elif old_state.state == STATE_CLOSING:
+                    self._attr_current_valve_position = 0
+
+                self._attr_is_opening = False
+                self._attr_is_closing = False
+
+                self.schedule_update_ha_state()
+            else:
+                valve_history = await get_instance(self.hass).async_add_executor_job(
+                    partial(
+                        history.get_last_state_changes,
+                        self.hass,
+                        10,
+                        entity_id=self.entity_id,
+                    )
+                )
+                for old_state in valve_history.get(self.entity_id, []):
+                    if old_state.state not in (STATE_UNKNOWN, STATE_UNAVAILABLE):
+                        if old_state.attributes.get(ATTR_CURRENT_POSITION) is not None:
+                            self._attr_current_valve_position = float(
+                                old_state.attributes[ATTR_CURRENT_POSITION]
+                            )
+                        elif old_state.state == STATE_OPEN:
+                            self._attr_current_valve_position = 100
+                        elif old_state.state == STATE_CLOSED:
+                            self._attr_current_valve_position = 0
+
+                        if old_state.state == STATE_OPENING:
+                            self._attr_current_valve_position = 100
+                        elif old_state.state == STATE_CLOSING:
+                            self._attr_current_valve_position = 0
+
+                        self._attr_is_opening = False
+                        self._attr_is_closing = False
+
+                        self.schedule_update_ha_state()
+                        break
+
+            if self._attr_current_valve_position is not None:
+                await self._update_device()
 
         async def async_update_state(value):
             self._attr_current_valve_position = value
