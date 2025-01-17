@@ -20,8 +20,7 @@ from .const import MOCK_CONFIG
 def auto_enable_custom_integrations(recorder_mock, enable_custom_integrations):
     """Enable custom integrations and suppress unwanted logging."""
     for name in ["sqlalchemy.engine.Engine", "homeassistant.components.recorder"]:
-        logger = logging.getLogger(name)
-        logger.setLevel(logging.ERROR)
+        logging.getLogger(name).setLevel(logging.ERROR)
     yield
 
 
@@ -101,7 +100,7 @@ nonce = 1
 # This fixture enables two-way communication with the device. The calls are logged
 # in the calls array. The command responses can be configured with command dict.
 @pytest.fixture(name="data_from_device")
-def data_from_device_fixture(hass):
+def data_from_device_fixture(hass: HomeAssistant):
     """Configure fake two-way communication."""
     for x in commands.values():
         x.reset_mock()
