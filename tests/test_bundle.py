@@ -20,6 +20,9 @@ def test_bundle_compile():
     assert "bundle.mpy" not in bundle._bundle_list
     assert "main.mpy" not in bundle._bundle_list
     assert all(x[-4:] == ".mpy" for x in bundle._bundle_list)
+    assert len(bundle._bundle_list) > 0
+    assert len(bundle._bundle_list) <= 10
+    assert len(bundle._bundle_list) == len(set(bundle._bundle_list))
 
     mock_listdir.return_value = ["test.py"]
     mock_compile.reset_mock()
@@ -55,6 +58,7 @@ def test_bundle_compile_memory_error():
     mock_listdir.return_value = ["test.py"]
     mock_compile.reset_mock()
     mock_soft_reset.reset_mock()
+    mock_bundle.return_value = ["bundle"]
 
     mock_compile.side_effect = MemoryError("Not enough memory")
 
@@ -73,6 +77,7 @@ def test_bundle_compile_main_bundle():
     mock_remove.reset_mock()
     mock_sync.reset_mock()
     mock_bundle.reset_mock()
+    mock_bundle.return_value = []
 
     importlib.reload(bundle)
 
@@ -89,11 +94,11 @@ def test_bundle_all_compiled():
     mock_sync.reset_mock()
     mock_soft_reset.reset_mock()
     mock_bundle.reset_mock()
-    mock_bundle.return_value = ["bundle"]
+    mock_bundle.return_value = []
 
     importlib.reload(bundle)
 
     mock_remove.assert_called_once_with("bundle.mpy")
     mock_sync.assert_called_once_with()
     mock_soft_reset.assert_called_once_with()
-    assert mock_bundle.call_count == 3
+    assert mock_bundle.call_count == 2

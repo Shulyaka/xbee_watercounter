@@ -57,14 +57,9 @@ if any(file.endswith(".py") for file in uos.listdir() + uos.listdir("lib")):
         machine.soft_reset()  # Retry or continue after reboot
 
 # Second stage: bundle
-if "bundle" in uos.bundle():
-
-    def _unbundle():
-        uos.bundle(None)
-        machine.soft_reset()
-
-    _unbundle()
-uos.remove("bundle.mpy")
-uos.sync()
-collect()
-uos.bundle(*_bundle_list)
+if "bundle" not in uos.bundle():
+    uos.remove("bundle.mpy")
+    uos.sync()
+    collect()
+    uos.bundle(*_bundle_list)
+    machine.soft_reset()

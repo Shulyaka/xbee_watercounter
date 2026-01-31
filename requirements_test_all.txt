@@ -20,4 +20,4 @@ aiousbwatcher
 ha_silabs_firmware_client
 psutil-home-assistant
 janus
-mpy-cross==1.12
+mpy-cross==1.20
