@@ -1,6 +1,5 @@
 """The tests for the Counter class."""
 
-
 import pytest
 from counter import Counter
 from lib.core import Sensor, Switch

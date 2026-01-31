@@ -82,9 +82,11 @@ async def async_setup_entry(hass, entry, async_add_entities):
             name="uptime",
             coordinator=coordinator,
             entity_description=entity_description,
-            conversion=lambda x: dt.datetime.fromtimestamp(x, tz=dt.timezone.utc)
-            if x > 0
-            else dt.datetime.now(tz=dt.timezone.utc) + dt.timedelta(seconds=x),
+            conversion=lambda x: (
+                dt.datetime.fromtimestamp(x, tz=dt.timezone.utc)
+                if x > 0
+                else dt.datetime.now(tz=dt.timezone.utc) + dt.timedelta(seconds=x)
+            ),
         )
     )
 
