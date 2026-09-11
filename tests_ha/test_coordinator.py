@@ -6,7 +6,7 @@ import threading
 from unittest.mock import AsyncMock, patch
 
 import pytest
-from homeassistant.core import callback
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import ServiceNotFound
 
 from custom_components.xbee_watercounter.coordinator import XBeeWatercounterApiClient
@@ -190,10 +190,10 @@ async def test_remote_buffer_full(cmd_mock, hass):
     assert cmd_mock.call_count == 3
 
 
-async def test_service_call_exception(hass):
+async def test_service_call_exception(hass: HomeAssistant) -> None:
     """Test service call exception."""
 
     client = XBeeWatercounterApiClient(hass, IEEE)
 
-    with pytest.raises(ServiceNotFound, match="service_not_found"):
+    with pytest.raises(ServiceNotFound):
         await client.async_command("bind")

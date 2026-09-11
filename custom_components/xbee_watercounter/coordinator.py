@@ -228,6 +228,8 @@ class XBeeWatercounterDataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching data from XBeeWatercounter."""
 
     config_entry: ConfigEntry
+    device_id: str
+    zha_device_id: str
 
     def __init__(
         self,
