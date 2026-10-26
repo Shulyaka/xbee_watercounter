@@ -1,8 +1,12 @@
 """The tests for the Counter class."""
 
 import pytest
-from counter import Counter
-from lib.core import Sensor, Switch
+
+from tests import mock_micropython
+
+with mock_micropython():
+    from counter import Counter
+    from lib.core import Sensor, Switch
 
 
 def test_counter_lo_hi():

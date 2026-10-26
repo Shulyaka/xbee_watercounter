@@ -3,7 +3,6 @@
 import importlib
 from unittest.mock import call
 
-import bundle
 from machine import soft_reset as mock_soft_reset
 from micropython import opt_level as mock_opt_level
 from uos import (
@@ -13,6 +12,11 @@ from uos import (
     remove as mock_remove,
     sync as mock_sync,
 )
+
+from tests import mock_micropython
+
+with mock_micropython():
+    import bundle
 
 
 def test_bundle_compile():
@@ -37,7 +41,8 @@ def test_bundle_compile():
 
     mock_remove.side_effect = remove
 
-    importlib.reload(bundle)
+    with mock_micropython():
+        importlib.reload(bundle)
 
     mock_opt_level.assert_called_once_with(3)
     assert mock_compile.call_args_list == [call("test.py"), call("test.py")]
@@ -62,7 +67,8 @@ def test_bundle_compile_memory_error():
 
     mock_compile.side_effect = MemoryError("Not enough memory")
 
-    importlib.reload(bundle)
+    with mock_micropython():
+        importlib.reload(bundle)
 
     mock_compile.side_effect = None
     mock_compile.assert_called_once_with("test.py")
@@ -79,7 +85,8 @@ def test_bundle_compile_main_bundle():
     mock_bundle.reset_mock()
     mock_bundle.return_value = []
 
-    importlib.reload(bundle)
+    with mock_micropython():
+        importlib.reload(bundle)
 
     mock_opt_level.assert_called_once_with(3)
     assert mock_compile.call_args_list[:2] == [call("main.py"), call("bundle.py")]
@@ -96,7 +103,8 @@ def test_bundle_all_compiled():
     mock_bundle.reset_mock()
     mock_bundle.return_value = []
 
-    importlib.reload(bundle)
+    with mock_micropython():
+        importlib.reload(bundle)
 
     mock_remove.assert_called_once_with("bundle.mpy")
     mock_sync.assert_called_once_with()

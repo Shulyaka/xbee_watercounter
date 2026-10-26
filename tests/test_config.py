@@ -1,8 +1,11 @@
 """Test config."""
 
-import config
-from lib.core import Sensor
-from valve import Valve
+from tests import mock_micropython
+
+with mock_micropython():
+    import config
+    from lib.core import Sensor
+    from valve import Valve
 
 
 def test_config():

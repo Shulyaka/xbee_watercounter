@@ -1,12 +1,16 @@
 """The tests for the Valve class."""
 
-from time import sleep as mock_sleep
 from unittest.mock import MagicMock
 
 import pytest
-from lib.core import Sensor, Switch
-from lib.mainloop import main_loop
-from valve import Valve
+from mock_time import sleep as mock_sleep
+
+from tests import mock_micropython
+
+with mock_micropython():
+    from lib.core import Sensor, Switch
+    from lib.mainloop import main_loop
+    from valve import Valve
 
 
 @pytest.fixture
