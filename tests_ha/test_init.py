@@ -46,12 +46,42 @@ async def test_init_unknown(hass, caplog, data_from_device, test_config_entry):
     await hass.async_block_till_done()
     assert "Test log" in caplog.text
 
-    assert hass.states.get("sensor.xbee_watercounter_1_counter").state == "unknown"
-    assert hass.states.get("sensor.xbee_watercounter_2_counter").state == "unknown"
-    assert hass.states.get("sensor.xbee_watercounter_3_counter").state == "unknown"
-    assert hass.states.get("valve.xbee_watercounter_1_valve").state == "unknown"
-    assert hass.states.get("valve.xbee_watercounter_2_valve").state == "unknown"
-    assert hass.states.get("valve.xbee_watercounter_3_valve").state == "unknown"
+    assert (
+        hass.states.get(
+            "sensor.xbee_watercounter_main_unit_xbee_watercounter_1_counter"
+        ).state
+        == "unknown"
+    )
+    assert (
+        hass.states.get(
+            "sensor.xbee_watercounter_main_unit_xbee_watercounter_2_counter"
+        ).state
+        == "unknown"
+    )
+    assert (
+        hass.states.get(
+            "sensor.xbee_watercounter_main_unit_xbee_watercounter_3_counter"
+        ).state
+        == "unknown"
+    )
+    assert (
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_1_valve"
+        ).state
+        == "unknown"
+    )
+    assert (
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_2_valve"
+        ).state
+        == "unknown"
+    )
+    assert (
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_3_valve"
+        ).state
+        == "unknown"
+    )
 
 
 @pytest.fixture
@@ -85,12 +115,42 @@ async def test_init_from_device(hass, data_from_device, test_1, test_config_entr
     commands["close"].assert_not_called()
     commands["stop"].assert_not_called()
 
-    assert hass.states.get("sensor.xbee_watercounter_1_counter").state == "0.1"
-    assert hass.states.get("sensor.xbee_watercounter_2_counter").state == "0.2"
-    assert hass.states.get("sensor.xbee_watercounter_3_counter").state == "0.3"
-    assert hass.states.get("valve.xbee_watercounter_1_valve").state == "open"
-    assert hass.states.get("valve.xbee_watercounter_2_valve").state == "open"
-    assert hass.states.get("valve.xbee_watercounter_3_valve").state == "open"
+    assert (
+        hass.states.get(
+            "sensor.xbee_watercounter_main_unit_xbee_watercounter_1_counter"
+        ).state
+        == "0.1"
+    )
+    assert (
+        hass.states.get(
+            "sensor.xbee_watercounter_main_unit_xbee_watercounter_2_counter"
+        ).state
+        == "0.2"
+    )
+    assert (
+        hass.states.get(
+            "sensor.xbee_watercounter_main_unit_xbee_watercounter_3_counter"
+        ).state
+        == "0.3"
+    )
+    assert (
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_1_valve"
+        ).state
+        == "open"
+    )
+    assert (
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_2_valve"
+        ).state
+        == "open"
+    )
+    assert (
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_3_valve"
+        ).state
+        == "open"
+    )
 
 
 @pytest.fixture
@@ -106,7 +166,7 @@ def restore_state_1(hass):
     }
 
     fake_state = State(
-        "sensor.xbee_watercounter_1_counter",
+        "sensor.xbee_watercounter_main_unit_xbee_watercounter_1_counter",
         "1.234",
         restored_attributes,
     )
@@ -118,7 +178,7 @@ def restore_state_1(hass):
     states.append((fake_state, fake_extra_data))
 
     fake_state = State(
-        "sensor.xbee_watercounter_2_counter",
+        "sensor.xbee_watercounter_main_unit_xbee_watercounter_2_counter",
         "2.345",
         restored_attributes,
     )
@@ -129,7 +189,7 @@ def restore_state_1(hass):
     states.append((fake_state, fake_extra_data))
 
     fake_state = State(
-        "sensor.xbee_watercounter_3_counter",
+        "sensor.xbee_watercounter_main_unit_xbee_watercounter_3_counter",
         "3.456",
         restored_attributes,
     )
@@ -141,7 +201,7 @@ def restore_state_1(hass):
     states.append((fake_state, fake_extra_data))
 
     fake_state = State(
-        "valve.xbee_watercounter_1_valve",
+        "valve.xbee_watercounter_main_unit_xbee_watercounter_1_valve",
         "open",
         {
             "current_position": 80,
@@ -153,7 +213,7 @@ def restore_state_1(hass):
     states.append((fake_state, None))
 
     fake_state = State(
-        "valve.xbee_watercounter_2_valve",
+        "valve.xbee_watercounter_main_unit_xbee_watercounter_2_valve",
         "closed",
         {
             "current_position": 0,
@@ -165,7 +225,7 @@ def restore_state_1(hass):
     states.append((fake_state, None))
 
     fake_state = State(
-        "valve.xbee_watercounter_3_valve",
+        "valve.xbee_watercounter_main_unit_xbee_watercounter_3_valve",
         "opening",
         {
             "current_position": 30,
@@ -212,28 +272,58 @@ async def test_init_from_last_state(
 
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.xbee_watercounter_1_counter").state == "1.234"
-    assert hass.states.get("sensor.xbee_watercounter_2_counter").state == "2.345"
-    assert hass.states.get("sensor.xbee_watercounter_3_counter").state == "3.456"
-    assert hass.states.get("valve.xbee_watercounter_1_valve").state == "open"
     assert (
-        hass.states.get("valve.xbee_watercounter_1_valve").attributes[
-            "current_position"
-        ]
+        hass.states.get(
+            "sensor.xbee_watercounter_main_unit_xbee_watercounter_1_counter"
+        ).state
+        == "1.234"
+    )
+    assert (
+        hass.states.get(
+            "sensor.xbee_watercounter_main_unit_xbee_watercounter_2_counter"
+        ).state
+        == "2.345"
+    )
+    assert (
+        hass.states.get(
+            "sensor.xbee_watercounter_main_unit_xbee_watercounter_3_counter"
+        ).state
+        == "3.456"
+    )
+    assert (
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_1_valve"
+        ).state
+        == "open"
+    )
+    assert (
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_1_valve"
+        ).attributes["current_position"]
         == 80
     )
-    assert hass.states.get("valve.xbee_watercounter_2_valve").state == "closed"
     assert (
-        hass.states.get("valve.xbee_watercounter_2_valve").attributes[
-            "current_position"
-        ]
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_2_valve"
+        ).state
+        == "closed"
+    )
+    assert (
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_2_valve"
+        ).attributes["current_position"]
         == 0
     )
-    assert hass.states.get("valve.xbee_watercounter_3_valve").state == "open"
     assert (
-        hass.states.get("valve.xbee_watercounter_3_valve").attributes[
-            "current_position"
-        ]
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_3_valve"
+        ).state
+        == "open"
+    )
+    assert (
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_3_valve"
+        ).attributes["current_position"]
         == 100
     )
 
@@ -257,18 +347,30 @@ async def test_init_from_history(hass, data_from_device, test_config_entry):
     }
 
     states = {
-        "sensor.xbee_watercounter_1_counter": [
-            State("sensor.xbee_watercounter_1_counter", "1.234", restored_attributes)
-        ],
-        "sensor.xbee_watercounter_2_counter": [
-            State("sensor.xbee_watercounter_2_counter", "2.345", restored_attributes)
-        ],
-        "sensor.xbee_watercounter_3_counter": [
-            State("sensor.xbee_watercounter_3_counter", "3.456", restored_attributes)
-        ],
-        "valve.xbee_watercounter_1_valve": [
+        "sensor.xbee_watercounter_main_unit_xbee_watercounter_1_counter": [
             State(
-                "valve.xbee_watercounter_1_valve",
+                "sensor.xbee_watercounter_main_unit_xbee_watercounter_1_counter",
+                "1.234",
+                restored_attributes,
+            )
+        ],
+        "sensor.xbee_watercounter_main_unit_xbee_watercounter_2_counter": [
+            State(
+                "sensor.xbee_watercounter_main_unit_xbee_watercounter_2_counter",
+                "2.345",
+                restored_attributes,
+            )
+        ],
+        "sensor.xbee_watercounter_main_unit_xbee_watercounter_3_counter": [
+            State(
+                "sensor.xbee_watercounter_main_unit_xbee_watercounter_3_counter",
+                "3.456",
+                restored_attributes,
+            )
+        ],
+        "valve.xbee_watercounter_main_unit_xbee_watercounter_1_valve": [
+            State(
+                "valve.xbee_watercounter_main_unit_xbee_watercounter_1_valve",
                 "open",
                 {
                     "current_position": 80,
@@ -278,9 +380,9 @@ async def test_init_from_history(hass, data_from_device, test_config_entry):
                 },
             )
         ],
-        "valve.xbee_watercounter_2_valve": [
+        "valve.xbee_watercounter_main_unit_xbee_watercounter_2_valve": [
             State(
-                "valve.xbee_watercounter_2_valve",
+                "valve.xbee_watercounter_main_unit_xbee_watercounter_2_valve",
                 "closed",
                 {
                     "current_position": 0,
@@ -290,9 +392,9 @@ async def test_init_from_history(hass, data_from_device, test_config_entry):
                 },
             )
         ],
-        "valve.xbee_watercounter_3_valve": [
+        "valve.xbee_watercounter_main_unit_xbee_watercounter_3_valve": [
             State(
-                "valve.xbee_watercounter_3_valve",
+                "valve.xbee_watercounter_main_unit_xbee_watercounter_3_valve",
                 "opening",
                 {
                     "current_position": 30,
@@ -341,28 +443,58 @@ async def test_init_from_history(hass, data_from_device, test_config_entry):
 
     await hass.async_block_till_done()
 
-    assert hass.states.get("sensor.xbee_watercounter_1_counter").state == "1.234"
-    assert hass.states.get("sensor.xbee_watercounter_2_counter").state == "2.345"
-    assert hass.states.get("sensor.xbee_watercounter_3_counter").state == "3.456"
-    assert hass.states.get("valve.xbee_watercounter_1_valve").state == "open"
     assert (
-        hass.states.get("valve.xbee_watercounter_1_valve").attributes[
-            "current_position"
-        ]
+        hass.states.get(
+            "sensor.xbee_watercounter_main_unit_xbee_watercounter_1_counter"
+        ).state
+        == "1.234"
+    )
+    assert (
+        hass.states.get(
+            "sensor.xbee_watercounter_main_unit_xbee_watercounter_2_counter"
+        ).state
+        == "2.345"
+    )
+    assert (
+        hass.states.get(
+            "sensor.xbee_watercounter_main_unit_xbee_watercounter_3_counter"
+        ).state
+        == "3.456"
+    )
+    assert (
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_1_valve"
+        ).state
+        == "open"
+    )
+    assert (
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_1_valve"
+        ).attributes["current_position"]
         == 80
     )
-    assert hass.states.get("valve.xbee_watercounter_2_valve").state == "closed"
     assert (
-        hass.states.get("valve.xbee_watercounter_2_valve").attributes[
-            "current_position"
-        ]
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_2_valve"
+        ).state
+        == "closed"
+    )
+    assert (
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_2_valve"
+        ).attributes["current_position"]
         == 0
     )
-    assert hass.states.get("valve.xbee_watercounter_3_valve").state == "open"
     assert (
-        hass.states.get("valve.xbee_watercounter_3_valve").attributes[
-            "current_position"
-        ]
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_3_valve"
+        ).state
+        == "open"
+    )
+    assert (
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_3_valve"
+        ).attributes["current_position"]
         == 100
     )
 
@@ -402,12 +534,42 @@ async def test_refresh(hass, data_from_device, test_config_entry):
         < 1.5
     )
 
-    assert hass.states.get("sensor.xbee_watercounter_1_counter").state == "1.234"
-    assert hass.states.get("sensor.xbee_watercounter_2_counter").state == "unknown"
-    assert hass.states.get("sensor.xbee_watercounter_3_counter").state == "unknown"
-    assert hass.states.get("valve.xbee_watercounter_1_valve").state == "unknown"
-    assert hass.states.get("valve.xbee_watercounter_2_valve").state == "open"
-    assert hass.states.get("valve.xbee_watercounter_3_valve").state == "closed"
+    assert (
+        hass.states.get(
+            "sensor.xbee_watercounter_main_unit_xbee_watercounter_1_counter"
+        ).state
+        == "1.234"
+    )
+    assert (
+        hass.states.get(
+            "sensor.xbee_watercounter_main_unit_xbee_watercounter_2_counter"
+        ).state
+        == "unknown"
+    )
+    assert (
+        hass.states.get(
+            "sensor.xbee_watercounter_main_unit_xbee_watercounter_3_counter"
+        ).state
+        == "unknown"
+    )
+    assert (
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_1_valve"
+        ).state
+        == "unknown"
+    )
+    assert (
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_2_valve"
+        ).state
+        == "open"
+    )
+    assert (
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_3_valve"
+        ).state
+        == "closed"
+    )
 
 
 async def test_reload(hass, data_from_device, test_config_entry):
@@ -432,12 +594,42 @@ async def test_reload(hass, data_from_device, test_config_entry):
     assert commands["counter"].call_args_list[1][0][0] == 1
     assert commands["counter"].call_args_list[2][0][0] == 2
 
-    assert hass.states.get("sensor.xbee_watercounter_1_counter").state == "1.234"
-    assert hass.states.get("sensor.xbee_watercounter_2_counter").state == "1.234"
-    assert hass.states.get("sensor.xbee_watercounter_3_counter").state == "1.234"
-    assert hass.states.get("valve.xbee_watercounter_1_valve").state == "open"
-    assert hass.states.get("valve.xbee_watercounter_2_valve").state == "open"
-    assert hass.states.get("valve.xbee_watercounter_3_valve").state == "open"
+    assert (
+        hass.states.get(
+            "sensor.xbee_watercounter_main_unit_xbee_watercounter_1_counter"
+        ).state
+        == "1.234"
+    )
+    assert (
+        hass.states.get(
+            "sensor.xbee_watercounter_main_unit_xbee_watercounter_2_counter"
+        ).state
+        == "1.234"
+    )
+    assert (
+        hass.states.get(
+            "sensor.xbee_watercounter_main_unit_xbee_watercounter_3_counter"
+        ).state
+        == "1.234"
+    )
+    assert (
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_1_valve"
+        ).state
+        == "open"
+    )
+    assert (
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_2_valve"
+        ).state
+        == "open"
+    )
+    assert (
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_3_valve"
+        ).state
+        == "open"
+    )
 
 
 async def test_coordinator_update(hass, data_from_device, test_config_entry):
@@ -460,12 +652,42 @@ async def test_coordinator_update(hass, data_from_device, test_config_entry):
     assert commands["counter"].call_args_list[1][0][0] == 1
     assert commands["counter"].call_args_list[2][0][0] == 2
 
-    assert hass.states.get("sensor.xbee_watercounter_1_counter").state == "1.234"
-    assert hass.states.get("sensor.xbee_watercounter_2_counter").state == "1.234"
-    assert hass.states.get("sensor.xbee_watercounter_3_counter").state == "1.234"
-    assert hass.states.get("valve.xbee_watercounter_1_valve").state == "open"
-    assert hass.states.get("valve.xbee_watercounter_2_valve").state == "open"
-    assert hass.states.get("valve.xbee_watercounter_3_valve").state == "open"
+    assert (
+        hass.states.get(
+            "sensor.xbee_watercounter_main_unit_xbee_watercounter_1_counter"
+        ).state
+        == "1.234"
+    )
+    assert (
+        hass.states.get(
+            "sensor.xbee_watercounter_main_unit_xbee_watercounter_2_counter"
+        ).state
+        == "1.234"
+    )
+    assert (
+        hass.states.get(
+            "sensor.xbee_watercounter_main_unit_xbee_watercounter_3_counter"
+        ).state
+        == "1.234"
+    )
+    assert (
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_1_valve"
+        ).state
+        == "open"
+    )
+    assert (
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_2_valve"
+        ).state
+        == "open"
+    )
+    assert (
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_3_valve"
+        ).state
+        == "open"
+    )
 
 
 async def test_device_reset(hass, data_from_device, test_config_entry):
@@ -508,12 +730,42 @@ async def test_device_reset(hass, data_from_device, test_config_entry):
     commands["counter"].assert_called_once_with([0, 1234])
     commands["reset_cause"].assert_called_once_with()
 
-    assert hass.states.get("sensor.xbee_watercounter_1_counter").state == "1.234"
-    assert hass.states.get("sensor.xbee_watercounter_2_counter").state == "unknown"
-    assert hass.states.get("sensor.xbee_watercounter_3_counter").state == "unknown"
-    assert hass.states.get("valve.xbee_watercounter_1_valve").state == "unknown"
-    assert hass.states.get("valve.xbee_watercounter_2_valve").state == "open"
-    assert hass.states.get("valve.xbee_watercounter_3_valve").state == "closed"
+    assert (
+        hass.states.get(
+            "sensor.xbee_watercounter_main_unit_xbee_watercounter_1_counter"
+        ).state
+        == "1.234"
+    )
+    assert (
+        hass.states.get(
+            "sensor.xbee_watercounter_main_unit_xbee_watercounter_2_counter"
+        ).state
+        == "unknown"
+    )
+    assert (
+        hass.states.get(
+            "sensor.xbee_watercounter_main_unit_xbee_watercounter_3_counter"
+        ).state
+        == "unknown"
+    )
+    assert (
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_1_valve"
+        ).state
+        == "unknown"
+    )
+    assert (
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_2_valve"
+        ).state
+        == "open"
+    )
+    assert (
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_3_valve"
+        ).state
+        == "closed"
+    )
 
 
 async def test_connection_recovery(hass, data_from_device, test_config_entry):
@@ -539,9 +791,39 @@ async def test_connection_recovery(hass, data_from_device, test_config_entry):
     assert commands["counter"].call_args_list[1][0][0] == 1
     assert commands["counter"].call_args_list[2][0][0] == 2
 
-    assert hass.states.get("sensor.xbee_watercounter_1_counter").state == "1.234"
-    assert hass.states.get("sensor.xbee_watercounter_2_counter").state == "1.234"
-    assert hass.states.get("sensor.xbee_watercounter_3_counter").state == "1.234"
-    assert hass.states.get("valve.xbee_watercounter_1_valve").state == "open"
-    assert hass.states.get("valve.xbee_watercounter_2_valve").state == "open"
-    assert hass.states.get("valve.xbee_watercounter_3_valve").state == "open"
+    assert (
+        hass.states.get(
+            "sensor.xbee_watercounter_main_unit_xbee_watercounter_1_counter"
+        ).state
+        == "1.234"
+    )
+    assert (
+        hass.states.get(
+            "sensor.xbee_watercounter_main_unit_xbee_watercounter_2_counter"
+        ).state
+        == "1.234"
+    )
+    assert (
+        hass.states.get(
+            "sensor.xbee_watercounter_main_unit_xbee_watercounter_3_counter"
+        ).state
+        == "1.234"
+    )
+    assert (
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_1_valve"
+        ).state
+        == "open"
+    )
+    assert (
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_2_valve"
+        ).state
+        == "open"
+    )
+    assert (
+        hass.states.get(
+            "valve.xbee_watercounter_main_unit_xbee_watercounter_3_valve"
+        ).state
+        == "open"
+    )

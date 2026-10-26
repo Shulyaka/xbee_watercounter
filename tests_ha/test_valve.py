@@ -16,9 +16,9 @@ from homeassistant.const import ATTR_ENTITY_ID, STATE_UNKNOWN
 from .conftest import commands
 from .const import IEEE
 
-ENT_VALVE1 = "valve.xbee_watercounter_1_valve"
-ENT_VALVE2 = "valve.xbee_watercounter_2_valve"
-ENT_VALVE3 = "valve.xbee_watercounter_3_valve"
+ENT_VALVE1 = "valve.xbee_watercounter_main_unit_xbee_watercounter_1_valve"
+ENT_VALVE2 = "valve.xbee_watercounter_main_unit_xbee_watercounter_2_valve"
+ENT_VALVE3 = "valve.xbee_watercounter_main_unit_xbee_watercounter_3_valve"
 
 
 def test_valve_init(hass, data_from_device, test_config_entry):

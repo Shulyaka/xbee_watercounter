@@ -78,8 +78,8 @@ async def test_device_topology(
             entity.entity_id
             for entity in er.async_entries_for_device(entity_registry, device.id)
         } == {
-            f"sensor.xbee_watercounter_{number + 1}_counter",
-            f"valve.xbee_watercounter_{number + 1}_valve",
+            f"sensor.xbee_watercounter_main_unit_xbee_watercounter_{number + 1}_counter",
+            f"valve.xbee_watercounter_main_unit_xbee_watercounter_{number + 1}_valve",
         }
 
     entities = er.async_entries_for_config_entry(
@@ -115,7 +115,9 @@ async def test_device_and_entity_ids_survive_reload(
     test_config_entry: MockConfigEntry,
 ) -> None:
     """Registration on reload preserves registry identities and user names."""
-    counter = entity_registry.async_get("sensor.xbee_watercounter_1_counter")
+    counter = entity_registry.async_get(
+        "sensor.xbee_watercounter_main_unit_xbee_watercounter_1_counter"
+    )
     assert counter is not None
     entity_registry.async_update_entity(
         counter.entity_id, new_entity_id="sensor.kitchen_water"
@@ -205,7 +207,12 @@ async def test_device_and_entity_ids_survive_reload(
         )
     } == children_before
     assert hass.states.get("sensor.kitchen_water") is not None
-    assert hass.states.get("sensor.xbee_watercounter_1_counter") is None
+    assert (
+        hass.states.get(
+            "sensor.xbee_watercounter_main_unit_xbee_watercounter_1_counter"
+        )
+        is None
+    )
 
 
 async def test_existing_channels_become_child_devices(
@@ -365,10 +372,14 @@ async def test_all_channels_after_reload(
     await hass.async_block_till_done()
 
     for number, value in enumerate(("12.345", "23.456", "34.567")):
-        counter = hass.states.get(f"sensor.xbee_watercounter_{number + 1}_counter")
+        counter = hass.states.get(
+            f"sensor.xbee_watercounter_main_unit_xbee_watercounter_{number + 1}_counter"
+        )
         assert counter is not None
         assert counter.state == value
-        valve = hass.states.get(f"valve.xbee_watercounter_{number + 1}_valve")
+        valve = hass.states.get(
+            f"valve.xbee_watercounter_main_unit_xbee_watercounter_{number + 1}_valve"
+        )
         assert valve is not None
         assert valve.state == "closed"
 
@@ -378,7 +389,8 @@ async def test_all_channels_after_reload(
         SERVICE_OPEN_VALVE,
         {
             ATTR_ENTITY_ID: [
-                f"valve.xbee_watercounter_{number + 1}_valve" for number in range(3)
+                f"valve.xbee_watercounter_main_unit_xbee_watercounter_{number + 1}_valve"
+                for number in range(3)
             ]
         },
         blocking=True,
@@ -388,13 +400,17 @@ async def test_all_channels_after_reload(
     commands["open"].assert_has_calls([call(0), call(1), call(2)], any_order=True)
     for number in range(3):
         assert (
-            hass.states.get(f"valve.xbee_watercounter_{number + 1}_valve").state
+            hass.states.get(
+                f"valve.xbee_watercounter_main_unit_xbee_watercounter_{number + 1}_valve"
+            ).state
             == "opening"
         )
 
     commands["counter"].reset_mock()
     for number, value in enumerate((13, 24, 35)):
-        entity_id = f"sensor.xbee_watercounter_{number + 1}_counter"
+        entity_id = (
+            f"sensor.xbee_watercounter_main_unit_xbee_watercounter_{number + 1}_counter"
+        )
         await hass.services.async_call(
             DOMAIN,
             "set_value",
